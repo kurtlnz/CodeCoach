@@ -52,20 +52,20 @@ namespace NotOO
 
         public class Apple : Product
         {
-            public string Name => "Apple";
-            public decimal UnitPrice => 0.35m;
+            public override string Name => "Apple";
+            public override decimal UnitPrice => 0.35m;
         }
         
         public class Banana : Product
         {
-            public string Name => "Banana";
-            public decimal UnitPrice => 0.75m;
+            public override string Name => "Banana";
+            public override decimal UnitPrice => 0.75m;
         }
         
         public class Product
         {
-            public string Name { get; set; }
-            public decimal UnitPrice { get; set; }
+            public virtual string Name { get; set; }
+            public virtual decimal UnitPrice { get; set; }
         }
     }
 }
