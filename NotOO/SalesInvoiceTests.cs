@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using FluentAssertions;
 using Xunit;
 
@@ -11,14 +12,14 @@ namespace NotOO
         public void Add_Lines_To_SalesInvoice_And_Verify_They_Have_Been_Added()
         {
             // Setup sales invoice lines
-            var lines = new List<SalesInvoiceLine>
-            {
-                new SalesInvoiceLine(new Apple(), 4), 
-                new SalesInvoiceLine(new Banana(), 3)
-            };
+            var apple = new Product("Apple", 0.35m);
+            var banana = new Product("Banana", 0.75m);
 
             // Set up sales invoice
-            var invoice = new SalesInvoice(lines);
+            var invoice = new SalesInvoice();
+            
+            invoice.Add(apple, 4);
+            invoice.Add(banana, 3);
 
             // Verify sales invoice has added the sales invoice lines.
             invoice.Total.Should().Be(3.65m);
@@ -27,45 +28,39 @@ namespace NotOO
         
         public class SalesInvoice
         {
-            public SalesInvoice(List<SalesInvoiceLine> lines)
-            {
-                Lines = lines;
-            }
-
             public decimal Total => Lines.Sum(l => l.Subtotal);
             public int LineCount => Lines.Count;
-            public List<SalesInvoiceLine> Lines { get; set; }
+            public List<SalesInvoiceLine> Lines { get; } = new List<SalesInvoiceLine>();
+
+            public void Add(Product product, int quantity)
+            {
+                Lines.Add(new SalesInvoiceLine(product, quantity));
+            }
         }
 
         public class SalesInvoiceLine
         {
+            public Product Product { get; }
+            public int Quantity { get; }
+            public decimal Subtotal => Quantity * Product.UnitPrice;
+            
             public SalesInvoiceLine(Product product, int quantity)
             {
                 Product = product;
                 Quantity = quantity;
             }
-            
-            public Product Product { get; set; }
-            public int Quantity { get; set; }
-            public decimal Subtotal => Quantity * Product.UnitPrice;
-        }
-
-        public class Apple : Product
-        {
-            public override string Name => "Apple";
-            public override decimal UnitPrice => 0.35m;
-        }
-        
-        public class Banana : Product
-        {
-            public override string Name => "Banana";
-            public override decimal UnitPrice => 0.75m;
         }
         
         public class Product
         {
-            public virtual string Name { get; set; }
-            public virtual decimal UnitPrice { get; set; }
+            public string Name { get; }
+            public decimal UnitPrice { get; }
+            
+            public Product(string name, decimal unitPrice)
+            {
+                Name = name;
+                UnitPrice = unitPrice;
+            }
         }
     }
 }
